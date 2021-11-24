@@ -18,4 +18,10 @@ contract ItemFactory {
     function itemsCount() public view returns (uint256) {
         return _items.length;
     }
+
+    function items() public view returns (Item[] memory coll) {
+        coll = _items;
+
+        return coll;
+    }
 }
