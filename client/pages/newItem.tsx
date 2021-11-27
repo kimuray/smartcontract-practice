@@ -1,8 +1,6 @@
 import type { NextPage } from 'next';
-import { useState, useEffect } from 'react';
-import { initializeWeb3 } from 'utils/web3Util';
-import ItemFactoryContract from 'contracts/ItemFactory.json'
-import { Contract } from 'web3-eth-contract'
+import { useState } from 'react';
+import { useContract } from 'hooks/useContract';
 
 type Item = {
   name: string
@@ -12,32 +10,11 @@ type Item = {
 }
 
 const newItem: NextPage = () => {
-  const [contract, setContract] = useState<Contract>(null)
-  const [accounts, setAccounts] = useState<string[]>([])
   const [item, setItem] = useState<Item>({ name: "", price: 0, imageURL: "", description: "" })
-
-  useEffect(() => { init() }, [])
-
-  const init = async () => {
-    try {
-      const web3 = await initializeWeb3()
-      const networkId = await web3.eth.net.getId()
-      const deployedNetworks = ItemFactoryContract.networks[networkId]
-      const accounts = await web3.eth.getAccounts()
-      const contract = new web3.eth.Contract(
-        ItemFactoryContract.abi,
-        deployedNetworks && deployedNetworks.address
-      )
-      setContract(contract)
-      setAccounts(accounts)
-    } catch (error) {
-      alert("Failed connect contracts")
-    }
-  }
+  const { contract, accounts } = useContract()
 
   const handleSubmit = async () => {
-    console.log(accounts)
-    await contract.methods
+    await contract?.methods
       .createItem(item.name, item.price, item.description, item.imageURL)
       .send({ from: accounts[0] })
   }
