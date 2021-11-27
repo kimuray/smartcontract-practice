@@ -7,7 +7,6 @@ import { Contract } from 'web3-eth-contract'
 type Item = {
   name: string
   price: number
-  owner: string
   imageURL: string
   description: string
 }
@@ -15,7 +14,7 @@ type Item = {
 const newItem: NextPage = () => {
   const [contract, setContract] = useState<Contract>(null)
   const [accounts, setAccounts] = useState<string[]>([])
-  const [item, setItem] = useState<Item>({ name: "", price: 0, owner: "", imageURL: "", description: "" })
+  const [item, setItem] = useState<Item>({ name: "", price: 0, imageURL: "", description: "" })
 
   useEffect(() => { init() }, [])
 
@@ -36,6 +35,13 @@ const newItem: NextPage = () => {
     }
   }
 
+  const handleSubmit = async () => {
+    console.log(accounts)
+    await contract.methods
+      .createItem(item.name, item.price, item.description, item.imageURL)
+      .send({ from: accounts[0] })
+  }
+
   return (
     <>
       <h1>Register Item</h1>
@@ -50,11 +56,6 @@ const newItem: NextPage = () => {
       </div>
 
       <div>
-        <label>Item owner</label><br />
-        <input type="text" onChange={(e) => setItem({ ...item, owner: e.target.value })} />
-      </div>
-
-      <div>
         <label>Item imageURL</label><br />
         <input type="text" onChange={(e) => setItem({ ...item, imageURL: e.target.value })} />
       </div>
@@ -63,6 +64,8 @@ const newItem: NextPage = () => {
         <label>Item description </label><br />
         <textarea onChange={(e) => setItem({ ...item, description: e.target.value })} />
       </div>
+
+      <button onClick={handleSubmit}>Register</button>
     </>
   )
 }
